@@ -20,7 +20,7 @@ class Card(object):
     def __str__(self):
         """Returns a human-readable string representation."""
         return '  %s of %s' % (Card.rank_names[self.rank],
-                             Card.suit_names[self.suit])
+                               Card.suit_names[self.suit])
 
     def get_value(self):
         if Card.rank_names[self.rank] == "Ace":

@@ -2,47 +2,47 @@ __author__ = 'ericpark'
 
 from Dealer import Dealer
 import time
-#Global Variables
+
+"""Global Variables"""
 d = Dealer()
+
 
 def main():
     print "Hello! Welcome to Blackjack!"
-    #Initialize variables
-    continueGame = True
-    handCounter = 1
+    """Initialize variables"""
+    hand_counter = 1
 
     #TODO: check for valid values.
 
-    currentBal = int(raw_input("How much would you like to start with? \n"))
-    while continueGame:
-        #Get command (Check Balance, Leave Table, Next hand)
+    current_bal = int(raw_input("How much would you like to start with? \n"))
+    while True:
+        """Get command (Check Balance, Leave Table, Next hand)"""
         #TODO: case sensitive
         command = raw_input("\nc = Check Balance    n = Nexthand    x = Exit \n")
-        while(command != 'x'):
+        while command != 'x':
             if command == 'c':
-                print "Your current balance is $" + str(currentBal)
+                print "Your current balance is $" + str(current_bal)
             if command == 'n':
                 break
             else:
                 print "Invalid Command."
             command = raw_input("\nc = Check Balance    n = Nexthand    x = Exit \n")
 
-        if(command == 'x'):
-            continueGame = False
+        if command == 'x':
             break
 
+        print "\nHand " + str(hand_counter)
 
-        print "\nHand " + str(handCounter)
-        #Deal Hand
+        """Deal Hands"""
         hand = d.deal_hand()
         dealer = d.deal_hand()
         show_hand(hand, dealer, False)
 
-        #While user Turn:
+        """While user's turn:"""
         hand = play(hand, dealer)
 
-        if(value_hand(hand) <= 21):
-            #Dealer Plays
+        if value_hand(hand) <= 21:
+            """Dealer plays if user did not bust"""
             print "Dealer Flipping card over"
             time.sleep(1)
             show_hand(hand, dealer, True)
@@ -55,16 +55,16 @@ def main():
                 print "Dealer wins."
         else:
             print "Dealer wins."
-        handCounter += 1
+        hand_counter += 1
 
 
 def play(hand, dealer):
     command = ''
     hand_value = value_hand(hand)
-    while (command != 's' and hand_value < 21):
-        # User Decides move (Hit, Fold, Double Down, Surrender?, Split)
+    while command != 's' and hand_value < 21:
+        """User Decides move (Hit, Fold, Double Down, Surrender?, Split)"""
         command = raw_input("\nh = Hit    f = Fold    s = Stay    sl = split \n\n")
-        if (command == 'h'):
+        if command == 'h':
             hand.append(d.deal_card())
             show_hand(hand, dealer, False)
         hand_value = value_hand(hand)
@@ -75,11 +75,13 @@ def play(hand, dealer):
 
 
 def dealer_play(hand, dealer):
+    """Returns the dealers hand after the moves. The strategy
+    used can be found in Dealer Strategy.py"""
     command = ''
     hand_value = value_hand(dealer)
-    while (command != 's' and hand_value < 21):
+    while command != 's' and hand_value < 21:
         command = d.dealer_move(dealer)
-        if (command == 'h'):
+        if command == 'h':
             dealer.append(d.deal_card())
             time.sleep(2)
             show_hand(hand, dealer, True)
@@ -88,11 +90,13 @@ def dealer_play(hand, dealer):
         print "\nDealer Busted! Total value is " + str(hand_value)
     return dealer
 
+
 def value_hand(hand):
+    """Returns the total value of the hand. """
     value = 0
     aces = 0
     for card in hand:
-        #if Ace, skip over and calculate later
+        """if Ace, skip over and calculate later"""
         if card.get_value() == 11:
             aces += 1
         else:
@@ -105,13 +109,15 @@ def value_hand(hand):
     return value
 
 
-def show_hand(hand, dealer, showCard):
+def show_hand(hand, dealer, show_card):
+    """Prints out the current hand for User and Dealer."""
     print "-------------------------------"
     print "Dealer's Hand: "
-    if showCard:
+    if show_card:
         for card in dealer:
             print card
     else:
+        """The Dealer shows the hidden card when all players have gone."""
         print dealer[0]
         print "  -Hidden-"
     print "\nYour Hand:"

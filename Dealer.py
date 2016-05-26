@@ -4,13 +4,14 @@ from Card import Card
 from random import shuffle
 from DealerStrategy import move
 
+
 class Dealer(object):
 
     netCash = 0
     deck = []
 
-    def __init__(self, numOfDecks=6):
-        for i in range(0, numOfDecks):
+    def __init__(self, num_of_decks=6):
+        for i in range(0, num_of_decks):
             for suit in range(0, len(Card.suit_names)):
                 for rank in range(0, len(Card.rank_names)):
                     self.deck.append(Card(suit, rank))
@@ -19,7 +20,7 @@ class Dealer(object):
     def __str__(self):
         return "Dealer has made " + str(self.netCash)
 
-    #TODO: Shuffle properly
+    # TODO Shuffle properly
     def shuffle_deck(self):
         shuffle(self.deck)
         shuffle(self.deck)
@@ -28,18 +29,15 @@ class Dealer(object):
     #    for i in range(0, len(self.deck)):
     #        print self.deck[i]
 
-    #Returns two cards from the shuffled deck
     def deal_hand(self):
-        newHand = []
-        newHand.append(self.deck.pop(0))
-        newHand.append(self.deck.pop(0))
-        return newHand
+        """Returns two cards from the shuffled deck"""
+        return [self.deck.pop(0), self.deck.pop(0)]
 
-
-    #Returns next card in the shuffled deck
     def deal_card(self):
-        nextCard = self.deck.pop(0)
-        return nextCard
+        """Returns next card in the shuffled deck"""
+        next_card = self.deck.pop(0)
+        return next_card
 
-    def dealer_move(self, hand):
+    @staticmethod
+    def dealer_move(hand):
         return move(hand)
