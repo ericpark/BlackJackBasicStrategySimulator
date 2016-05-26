@@ -5,28 +5,40 @@ import time
 
 """Global Variables"""
 d = Dealer()
-
+table_min = 10
 
 def main():
     print "Hello! Welcome to Blackjack!"
+    print "The table minimum is " + str(table_min)
     """Initialize variables"""
     hand_counter = 1
+    while True:
+        try:
+            current_bal = int(raw_input("How much would you like to start with? \n"))
+            break
+        except ValueError:
+            print "\nPlease type in a valid number.\n"
 
-    #TODO: check for valid values.
-
-    current_bal = int(raw_input("How much would you like to start with? \n"))
     while True:
         """Get command (Check Balance, Leave Table, Next hand)"""
         #TODO: case sensitive
-        command = raw_input("\nc = Check Balance    n = Nexthand    x = Exit \n")
+        print "Commands:"
+        command = raw_input("\nc = Check Balance    x = Exit    Enter in bet amount:\n")
+        current_bet = 0
         while command != 'x':
             if command == 'c':
                 print "Your current balance is $" + str(current_bal)
-            if command == 'n':
+            elif command == 'x':
                 break
             else:
-                print "Invalid Command."
-            command = raw_input("\nc = Check Balance    n = Nexthand    x = Exit \n")
+                try:
+                    if int(command) >= table_min and int(command) <= current_bal:
+                        current_bet = int(command)
+                        break
+                except ValueError:
+                    print "\nPlease type in a valid command or " +\
+                          "number above the table minimum ($" + str(table_min) + ")\n"
+            command = raw_input("\nc = Check Balance    x = Exit    Enter in bet amount:\n")
 
         if command == 'x':
             break
@@ -48,10 +60,12 @@ def main():
             show_hand(hand, dealer, True)
             dealer = dealer_play(hand, dealer)
             if value_hand(hand) > value_hand(dealer) or value_hand(dealer) > 21:
+                current_bal += current_bet
                 print "You win!"
             elif value_hand(hand) == value_hand(dealer):
                 print "Push! Tie"
             else:
+                current_bal -= current_bet
                 print "Dealer wins."
         else:
             print "Dealer wins."
