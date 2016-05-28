@@ -7,6 +7,7 @@ import time
 d = Dealer()
 table_min = 10
 
+
 def main():
     print "Hello! Welcome to Blackjack!"
     print "The table minimum is " + str(table_min)
@@ -18,27 +19,40 @@ def main():
             break
         except ValueError:
             print "\nPlease type in a valid number.\n"
-
+    current_bet = 0
     while True:
         """Get command (Check Balance, Leave Table, Next hand)"""
-        #TODO: case sensitive
-        print "Commands:"
-        command = raw_input("\nc = Check Balance    x = Exit    Enter in bet amount:\n")
-        current_bet = 0
+         #TODO: case sensitive
+
+        if current_bal < table_min:
+            print "Sorry! You do not have enough money. Thank you for playing. "
+            print "Your current balance is $" + str(current_bal)
+            break
+
+        print "\nCommands:"
+        command = raw_input("Current balance is $" + str(
+            current_bal) + "   x = Exit   Enter in bet amount:\n(Or Enter to keep the previous bet.)\n")
         while command != 'x':
-            if command == 'c':
-                print "Your current balance is $" + str(current_bal)
-            elif command == 'x':
+            if command == 'x':
                 break
+            if command == '':
+                if current_bet < table_min:
+                    print "You have not put in an initial bet. " \
+                          "Please bet above the table minimum: $" + str(table_min) + "\n"
+                else:
+                    break
             else:
                 try:
-                    if int(command) >= table_min and int(command) <= current_bal:
+                    if table_min <= int(command) <= current_bal:
                         current_bet = int(command)
                         break
+                    else:
+                        print "Please bet below your balance and above the table minimum: $" + str(table_min) + "\n"
                 except ValueError:
                     print "\nPlease type in a valid command or " +\
                           "number above the table minimum ($" + str(table_min) + ")\n"
-            command = raw_input("\nc = Check Balance    x = Exit    Enter in bet amount:\n")
+            command = raw_input("Current balance is $" + str(
+                current_bal) + "   x = Exit   Enter in bet amount:\n(Or Enter to keep the previous bet.)\n")
 
         if command == 'x':
             break
@@ -52,8 +66,12 @@ def main():
 
         """While user's turn:"""
         hand = play(hand, dealer)
-
-        if value_hand(hand) <= 21:
+        hand_value = value_hand(hand)
+        if hand_value == 21 and len(hand) == 2:
+            """Player got blackjack"""
+            current_bal += current_bet * 1.5
+            print "Blackjack!"
+        elif value_hand(hand) <= 21:
             """Dealer plays if user did not bust"""
             print "Dealer Flipping card over"
             time.sleep(1)
@@ -75,6 +93,8 @@ def main():
 def play(hand, dealer):
     command = ''
     hand_value = value_hand(hand)
+    if hand_value == 21:
+        return hand
     while command != 's' and hand_value < 21:
         """User Decides move (Hit, Fold, Double Down, Surrender?, Split)"""
         command = raw_input("\nh = Hit    f = Fold    s = Stay    sl = split \n\n")
