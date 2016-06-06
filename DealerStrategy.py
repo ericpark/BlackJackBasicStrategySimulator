@@ -1,5 +1,4 @@
 __author__ = 'ericpark'
-
 soft = False
 
 
@@ -7,9 +6,9 @@ def move(hand):
     value = value_hand(hand)
     """Check if "soft" 17"""
 
-    if(value < 17):
+    if value < 17:
         return "h"
-    elif(value == 17 and soft):
+    elif value == 17 and soft:
         return "h"
     else:
         return "s"
@@ -27,7 +26,6 @@ def value_hand(hand):
     for i in range(0, aces):
         if value + 11 <= 21:
             value += 11
-            soft = True
         else:
             value += 1
     return value

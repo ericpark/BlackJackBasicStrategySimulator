@@ -1,161 +1,83 @@
 __author__ = 'ericpark'
 
 from Dealer import Dealer
-import time
+from Player import Player
 
 """Global Variables"""
-d = Dealer()
 table_min = 10
+table_max = 500
 
 
 def main():
+    player = Player()
+    dealer = Dealer()
     print "Hello! Welcome to Blackjack!"
     print "The table minimum is " + str(table_min)
     """Initialize variables"""
     hand_counter = 1
     while True:
         try:
-            current_bal = int(raw_input("How much would you like to start with? \n"))
+            player.set_current_bal(int(raw_input("How much would you like to start with? \n")))
             break
         except ValueError:
             print "\nPlease type in a valid number.\n"
-    current_bet = 0
     while True:
-        """Get command (Check Balance, Leave Table, Next hand)"""
-         #TODO: case sensitive
-
-        if current_bal < table_min:
+        """Check if the player can play first."""
+        if not player.get_current_bal() >= table_min:
             print "Sorry! You do not have enough money. Thank you for playing. "
-            print "Your current balance is $" + str(current_bal)
+            print "Your current balance is $" + str(p.get_current_bal())
             break
 
+        """Get command (Check Balance, Leave Table, Next hand)"""
         print "\nCommands:"
         command = raw_input("Current balance is $" + str(
-            current_bal) + "   x = Exit   Enter in bet amount:\n(Or Enter to keep the previous bet.)\n")
-        while command != 'x':
-            if command == 'x':
-                break
+            player.get_current_bal()) + "   x = Exit   Enter in bet amount:\n(Or Enter to keep the previous bet.)\n")
+        while command != 'x' or command != 'X':
             if command == '':
-                if current_bet < table_min:
+                print(player.get_current_bal())
+                if player.get_current_bet() < table_min:
                     print "You have not put in an initial bet. " \
                           "Please bet above the table minimum: $" + str(table_min) + "\n"
                 else:
                     break
+            if command == 'x' or command == 'X':
+                break
             else:
                 try:
-                    if table_min <= int(command) <= current_bal:
-                        current_bet = int(command)
+                    if table_min <= int(command) <= player.get_current_bal() and int(command) <= table_max:
+                        player.set_current_bet(int(command))
                         break
                     else:
-                        print "Please bet below your balance and above the table minimum: $" + str(table_min) + "\n"
+                        print "Please bet below your balance and within the table range: " \
+                              "$" + str(table_min) + "-$" + str(table_max) + "\n"
                 except ValueError:
                     print "\nPlease type in a valid command or " +\
                           "number above the table minimum ($" + str(table_min) + ")\n"
             command = raw_input("Current balance is $" + str(
-                current_bal) + "   x = Exit   Enter in bet amount:\n(Or Enter to keep the previous bet.)\n")
+                player.get_current_bal()) + "   x = Exit   Enter in bet amount:\n(Or Enter to keep the previous bet.)\n")
 
-        if command == 'x':
-            break
-
-        print "\nHand " + str(hand_counter)
+        if command == 'x':  # Exit the game
+            break  # I know there is a better way to do this but this works.
 
         """Deal Hands"""
-        hand = d.deal_hand()
-        dealer = d.deal_hand()
-        show_hand(hand, dealer, False)
+        print "\nHand " + str(hand_counter)
+        player.set_hand(dealer.deal_hand())
+        dealer.set_hand(dealer.deal_hand())
 
-        """While user's turn:"""
-        hand = play(hand, dealer)
-        hand_value = value_hand(hand)
-        if hand_value == 21 and len(hand) == 2:
-            """Player got blackjack"""
-            current_bal += current_bet * 1.5
-            print "Blackjack!"
-        elif value_hand(hand) <= 21:
-            """Dealer plays if user did not bust"""
-            print "Dealer Flipping card over"
-            time.sleep(1)
-            show_hand(hand, dealer, True)
-            dealer = dealer_play(hand, dealer)
-            if value_hand(hand) > value_hand(dealer) or value_hand(dealer) > 21:
-                current_bal += current_bet
-                print "You win!"
-            elif value_hand(hand) == value_hand(dealer):
-                print "Push! Tie"
-            else:
-                current_bal -= current_bet
+        dealer.show_hand(dealer.get_hand(), player.get_hand(), False)
+        dealer, player, continue_game = dealer.insurance(dealer, player)
+
+        if continue_game:
+            """play"""
+            dealer, player, bust = player.play(dealer, player)
+            if not bust:
                 print "Dealer wins."
+            else:
+                dealer, player = dealer.dealer_play(dealer, player)
         else:
-            print "Dealer wins."
+            dealer.show_hand(dealer.get_hand(), player.get_hand(), True)
+            if Dealer.value_hand(dealer.get_hand()) == 21:
+                print "Dealer Wins. Dealer Hand Value: 21"
+
         hand_counter += 1
-
-
-def play(hand, dealer):
-    command = ''
-    hand_value = value_hand(hand)
-    if hand_value == 21:
-        return hand
-    while command != 's' and hand_value < 21:
-        """User Decides move (Hit, Fold, Double Down, Surrender?, Split)"""
-        command = raw_input("\nh = Hit    f = Fold    s = Stay    sl = split \n\n")
-        if command == 'h':
-            hand.append(d.deal_card())
-            show_hand(hand, dealer, False)
-        hand_value = value_hand(hand)
-
-    if hand_value > 21:
-        print "\nYou Busted. Total value is " + str(hand_value)
-    return hand
-
-
-def dealer_play(hand, dealer):
-    """Returns the dealers hand after the moves. The strategy
-    used can be found in Dealer Strategy.py"""
-    command = ''
-    hand_value = value_hand(dealer)
-    while command != 's' and hand_value < 21:
-        command = d.dealer_move(dealer)
-        if command == 'h':
-            dealer.append(d.deal_card())
-            time.sleep(2)
-            show_hand(hand, dealer, True)
-        hand_value = value_hand(dealer)
-    if hand_value > 21:
-        print "\nDealer Busted! Total value is " + str(hand_value)
-    return dealer
-
-
-def value_hand(hand):
-    """Returns the total value of the hand. """
-    value = 0
-    aces = 0
-    for card in hand:
-        """if Ace, skip over and calculate later"""
-        if card.get_value() == 11:
-            aces += 1
-        else:
-            value += card.get_value()
-    for i in range(0, aces):
-        if value + 11 <= 21:
-            value += 11
-        else:
-            value += 1
-    return value
-
-
-def show_hand(hand, dealer, show_card):
-    """Prints out the current hand for User and Dealer."""
-    print "-------------------------------"
-    print "Dealer's Hand: "
-    if show_card:
-        for card in dealer:
-            print card
-    else:
-        """The Dealer shows the hidden card when all players have gone."""
-        print dealer[0]
-        print "  -Hidden-"
-    print "\nYour Hand:"
-    for card in hand:
-        print card
-    print "-------------------------------"
 main()
