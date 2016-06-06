@@ -1,9 +1,8 @@
 __author__ = 'ericpark'
-soft = False
 
 
 def move(hand):
-    value = value_hand(hand)
+    value, soft = value_hand(hand)
     """Check if "soft" 17"""
 
     if value < 17:
@@ -17,6 +16,7 @@ def move(hand):
 def value_hand(hand):
     value = 0
     aces = 0
+    soft = False
     for card in hand:
         """If Ace, skip over and calculate later """
         if card.get_value() == 11:
@@ -26,6 +26,7 @@ def value_hand(hand):
     for i in range(0, aces):
         if value + 11 <= 21:
             value += 11
+            soft = True
         else:
             value += 1
-    return value
+    return value, soft

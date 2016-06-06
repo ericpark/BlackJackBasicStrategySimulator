@@ -46,8 +46,7 @@ class Dealer(object):
         next_card = self.deck.pop(0)
         return next_card
 
-    @staticmethod
-    def insurance(dealer, player):
+    def insurance(self, dealer, player):
         """Return Dealer, Player, True if player continues, False if player does not continue"""
         player_hand_value = Dealer.value_hand(player.get_hand())
         if dealer.get_hand()[0].get_value() == 11:
@@ -64,7 +63,7 @@ class Dealer(object):
                             "Please type in a valid command. y = Yes or n = No")
             else:
                 """Ask for insurance"""
-                command = raw_input("The dealer is showing an Ace. Would you like get insurance? y = Yes or n = No")
+                command = raw_input("The dealer is showing an Ace. Would you like get insurance? y = Yes or n = No\n")
                 while command != 'y' or command != 'Y' or command != 'n' or command != 'N':
                     # TODO: Can make this into simpler statement
                     if command == 'y' or command == 'Y':
@@ -84,6 +83,17 @@ class Dealer(object):
                     else:
                         command = raw_input(
                             "Please type in a valid command. y = Yes or n = No")
+        elif dealer.get_hand()[0].get_value() == 10 and dealer.get_hand()[1].get_value() == 11:
+            if player_hand_value == 21:
+                time.sleep(1)
+                self.show_hand(self.hand, player.get_hand(), True)
+                print "Dealer got Blackjack!"
+            else:
+                time.sleep(1)
+                self.show_hand(self.hand, player.get_hand(), True)
+                print "Dealer got Blackjack!"
+                player.set_current_bal_difference(-player.get_current_bet())
+                return dealer, player, False
         return dealer, player, True
 
     def dealer_play(self, dealer, player):
@@ -91,7 +101,7 @@ class Dealer(object):
         used can be found in Dealer Strategy.py"""
         command = ''
         print "Dealer Flipping card over"
-        time.sleep(2)
+        time.sleep(1)
         dealer_hand_value = Dealer.value_hand(self.hand)
         self.show_hand(self.hand, player.get_hand(), True)
         while command != 's' and dealer_hand_value < 21:

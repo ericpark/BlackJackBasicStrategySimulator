@@ -19,26 +19,26 @@ class Player(object):
     def __str__(self):
         return "Player has made " + str(self.current_bal - self.starting_bal)
 
-    def set_hand(self, hand):
-        self.hand = hand
-
     def get_hand(self):
         return self.hand
-
-    def set_current_bal(self, bal):
-        self.current_bal = bal
-
-    def set_current_bal_difference(self, bal):
-        self.current_bal += bal
 
     def get_current_bal(self):
         return self.current_bal
 
+    def get_current_bet(self):
+        return self.current_bet
+
+    def set_hand(self, hand):
+        self.hand = hand
+
+    def set_current_bal(self, bal):
+        self.current_bal = bal
+
     def set_current_bet(self, bet):
         self.current_bet = bet
 
-    def get_current_bet(self):
-        return self.current_bet
+    def set_current_bal_difference(self, bal):
+        self.current_bal += bal
 
     @staticmethod
     def play(dealer, player):
@@ -48,7 +48,7 @@ class Player(object):
             return dealer, player, True
         while command != 's' and player_hand_value < 21:
             """User Decides move (Hit, Fold, Double Down, Surrender?, Split)"""
-            command = raw_input("\nh = Hit    f = Fold    s = Stay    sl = split    d = Double Down\n\n")
+            command = raw_input("\nh = Hit    su = Surrender    s = Stay    sl = split    d = Double Down\n\n")
 
             if command == 'h':
                 dealt_card = dealer.deal_card()
@@ -65,9 +65,13 @@ class Player(object):
                 player.set_hand(hand)
                 Dealer.show_hand(dealer.get_hand(), player.get_hand(), False)
                 player.set_current_bet(player.get_current_bet()*2)
+                player_hand_value = Dealer.value_hand(player.get_hand())
                 break
+            elif command == 'su':
+                player.set_current_bal_difference(player.get_current_bet()/2)
+                print "You surrender!"
+                return dealer, player, False
             player_hand_value = Dealer.value_hand(player.get_hand())
-
         if player_hand_value > 21:
             print "\nYou Busted. Total value is " + str(player_hand_value)
             return dealer, player, False
