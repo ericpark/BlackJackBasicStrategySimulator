@@ -67,6 +67,7 @@ class Player(object):
                 hand.append(dealt_card)
                 player.set_hand(hand)
                 Dealer.show_hand(dealer.get_hand(), player.get_hand(), False)
+                turn += 1
             elif command == 'sl':
                 """If splits are Ace, then only allow one card each."""
                 hand = player.get_hand()
@@ -84,9 +85,10 @@ class Player(object):
                             Dealer.show_hand(dealer.get_hand(), player.get_hands(), False)
                             return dealer, player, True
                         else:
+                            total_hands = []
                             for i in range(0, 2):
                                 dealt_card = dealer.deal_card()
-                                new_hand = [hand[0], dealt_card]
+                                new_hand = [hand[i], dealt_card]
                                 hands.append(new_hand)
                             player.set_hands(hands)
                             Dealer.show_hand(dealer.get_hand(), player.get_hands(), False)
@@ -94,18 +96,21 @@ class Player(object):
                             not_bust = True
                             time.sleep(2)
                             for i in range(0, 2):
-                                Dealer.show_hand(dealer.get_hand(), hands[i], False)
                                 temp_p = Player()
                                 temp_p.set_hand(hands[i])
-                                dealer, temp_p, bust = player.play(dealer, temp_p, True)
-                                if len(temp_p.get_hands()) > 1:
-
+                                Dealer.show_hand(dealer.get_hand(), temp_p.get_hand(), False)
+                                dealer, temp_p, bust = Player.play(dealer, temp_p, True)
+                                temp_p_hands = temp_p.get_hands()
+                                for j in range(0, len(temp_p_hands)):
+                                    total_hands.append(temp_p_hands[j])
                                 not_bust = not_bust and bust
+                            player.set_hands(total_hands)
                             return dealer, player, not_bust
                     else:
                         print "Sorry! You can only split on the first turn."
                 else:
                     print "Sorry! Your cards have to the same."
+                turn += 1
             elif command == 'd':
                 if turn == 1:
                     dealt_card = dealer.deal_card()
@@ -119,6 +124,7 @@ class Player(object):
                     break
                 else:
                     print "Sorry! Can only double down on the first turn!"
+                turn += 1
             elif command == 'su':
                 if turn == 1:
                     player.set_current_bal_difference(player.get_current_bet()/2)
@@ -126,10 +132,8 @@ class Player(object):
                     return dealer, player, False
                 else:
                     print "Sorry! Can only surrender on the first turn!"
-            elif command == '':
-                turn -= 1
+                turn += 1
             player_hand_value = Dealer.value_hand(player.get_hand())
-            turn += 1
         if player_hand_value > 21:
             print "\nYou Busted. Total value is " + str(player_hand_value)
             return dealer, player, False
