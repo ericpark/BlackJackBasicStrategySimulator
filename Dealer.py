@@ -57,7 +57,7 @@ class Dealer(object):
                         player.set_current_bal_difference(player.get_current_bet())
                         return dealer, player, False
                     elif command == 'n' or command == 'N':
-                        return dealer, player, True
+                        return dealer, player, False
                     else:
                         command = raw_input(
                             "Please type in a valid command. y = Yes or n = No")
@@ -103,14 +103,14 @@ class Dealer(object):
         print "Dealer Flipping card over"
         time.sleep(1)
         dealer_hand_value = Dealer.value_hand(self.hand)
-        self.show_hand(self.hand, player.get_hand(), True)
+        self.show_hand(self.hand, player.get_hands(), True)
         while command != 's' and dealer_hand_value < 21:
             command = self.dealer_move(self.hand)
             if command == 'h':
                 dealt_card = self.deal_card()
                 self.hand.append(dealt_card)
                 time.sleep(2)
-                self.show_hand(self.hand, player.get_hand(), True)
+                self.show_hand(self.hand, player.get_hands(), True)
             dealer_hand_value = self.value_hand(self.hand)
         if dealer_hand_value > 21:
             print "\nDealer Busted! Total value is " + str(dealer_hand_value)
@@ -133,8 +133,14 @@ class Dealer(object):
             print dealer[0]
             print "  -Hidden-"
         print "\nYour Hand:"
-        for card in player:
-            print card
+        if all(isinstance(elem, list) for elem in player):
+            for hands in player:
+                for card in hands:
+                    print card
+                print " "
+        else:
+            for card in player:
+                print card
         print "-------------------------------"
 
     @staticmethod
