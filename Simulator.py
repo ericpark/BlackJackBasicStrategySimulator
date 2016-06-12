@@ -68,7 +68,7 @@ def main():
 
         """Deal Hands"""
         print "\nHand " + str(hand_counter)
-        player.set_hand([Card(0, 10), Card(0, 10)])
+        player.set_hand(dealer.deal_hand())
         dealer.set_hand(dealer.deal_hand())
 
         dealer.show_hand(dealer.get_hand(), [player.get_hand()], False)
@@ -124,4 +124,5 @@ def main():
                 print "Dealer Wins! ~ But not exactly sure why"
 
         hand_counter += 1
+    print player
 main()

@@ -3,19 +3,21 @@ from Dealer import Dealer
 import time
 
 
-class Player(object):
+class PlayerAI(object):
 
     hand = []
     hands = []
     starting_bal = 0
     current_bal = 0
     current_bet = -1
+    ai = False
 
-    def __init__(self):
-        self.hand = []
-        self.current_bal = 0
-        self.starting_bal = -1
-        self.current_bet = -1
+    def __init__(self, hand, bal, bet):
+        self.hand = hand
+        self.hands = hand
+        self.current_bal = bal
+        self.starting_bal = bal
+        self.current_bet = bet
 
     def __str__(self):
         if self.current_bal - self.starting_bal >= 0:
@@ -43,8 +45,6 @@ class Player(object):
 
     def set_current_bal(self, bal):
         self.current_bal = bal
-        if self.starting_bal == -1:
-            self.starting_bal = self.current_bal
 
     def set_current_bet(self, bet):
         self.current_bet = bet
